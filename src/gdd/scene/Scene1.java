@@ -1,6 +1,7 @@
 package gdd.scene;
 
 import gdd.AudioPlayer;
+import gdd.sprite.Platform;
 import gdd.Game;
 import static gdd.Global.*;
 import gdd.SpawnDetails;
@@ -27,6 +28,10 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.Rectangle;
+import java.awt.Color;
+import java.awt.Graphics;
+
 
 public class Scene1 extends JPanel {
 
@@ -36,6 +41,8 @@ public class Scene1 extends JPanel {
     private List<Explosion> explosions;
     private List<Shot> shots;
     private Player player;
+    private List<Platform> platforms;
+    private java.util.Set<Integer> spawnedRows = new java.util.HashSet<>();
     // private Shot shot;
 
     final int BLOCKHEIGHT = 50;
@@ -61,17 +68,17 @@ public class Scene1 extends JPanel {
     private final int[][] MAP = {
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 2, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+        {2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0},
         {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -82,7 +89,31 @@ public class Scene1 extends JPanel {
         {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+        {2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 2, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+        {2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0},
+        {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+        {2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1}
     };
 
     private HashMap<Integer, SpawnDetails> spawnMap = new HashMap<>();
@@ -167,6 +198,7 @@ public class Scene1 extends JPanel {
         // }
         // }
         player = new Player();
+        platforms = buildPlatforms(MAP);
         // shot = new Shot();
     }
 
@@ -203,10 +235,46 @@ public class Scene1 extends JPanel {
                     // Draw a cluster of stars
                     drawStarCluster(g, x, y, BLOCKWIDTH, BLOCKHEIGHT);
                 }
+                //if (MAP[mapRow][col] == 2) {
+                //    drawPlatforms(g);
+                //}
             }
         }
 
     }
+
+    private void drawPlatforms(Graphics g) {
+        for (Platform platform : platforms) {
+            platform.draw(g);
+        }
+    }
+
+    private List<Platform>buildPlatforms(int[][] Map) {
+        List<Platform> result = new ArrayList<>();
+
+        for (int col = 0; col < Map.length; col++) {
+            int row = 0;
+            while (row < Map[col].length) {
+                int tile = Map[col][row];
+                if(tile == 0 || tile == 1) {
+                    row++;
+                    continue;
+                }
+                int runStart = row;
+                while (row < Map[col].length && Map[col][row] == tile) {
+                    row++;
+                }
+                int tileX = runStart * BLOCKWIDTH;
+                int tileY = col * BLOCKHEIGHT;
+                int tileWidth = (row - runStart) * BLOCKWIDTH;
+                Color color = (tile == 2) ? new Color(60, 40, 20) : new Color(100, 100, 100);
+                result.add(new Platform(tileX, tileY, tileWidth, BLOCKHEIGHT, color));
+            }
+        }
+
+        return result;
+    }
+            
 
     private void drawStarCluster(Graphics g, int x, int y, int width, int height) {
         // Set star color to white
@@ -335,6 +403,7 @@ public class Scene1 extends JPanel {
         if (inGame) {
 
             drawMap(g);  // Draw background stars first
+            drawPlatforms(g);  // Draw platforms next
             drawExplosions(g);
             drawPowreUps(g);
             drawAliens(g);
@@ -401,6 +470,11 @@ public class Scene1 extends JPanel {
             }
         }
 
+        int scrollSpeed = 1;
+        for (Platform platform : platforms) {
+            platform.setY(platform.getY() + scrollSpeed);
+        }
+
         if (deaths == NUMBER_OF_ALIENS_TO_DESTROY) {
             inGame = false;
             timer.stop();
@@ -429,6 +503,7 @@ public class Scene1 extends JPanel {
 
         // shot
         List<Shot> shotsToRemove = new ArrayList<>();
+        List<Platform> platformsToRemove = new ArrayList<>();
         for (Shot shot : shots) {
 
             if (shot.isVisible()) {
@@ -456,6 +531,22 @@ public class Scene1 extends JPanel {
                     }
                 }
 
+                for (Platform platform : platforms) {
+                    // Collision detection: shot and platform
+                    if (shot.isVisible() && shot.getBounds().intersects(platform.getBounds())) {
+                        shot.die();
+                        shotsToRemove.add(shot);
+                        platformsToRemove.add(platform);
+                        try {
+                            String filePath = "src/audio/Explosion.wav";
+                            audioPlayer = new AudioPlayer(filePath);
+                            audioPlayer.playOnce();
+                        } catch (Exception er) {
+                            System.err.println("Error initializing audio player: " + er.getMessage());
+                        }
+                    }
+                }
+
                 int y = shot.getY();
                 // y -= 4;
                 y -= 20;
@@ -468,8 +559,74 @@ public class Scene1 extends JPanel {
                 }
             }
         }
-        shots.removeAll(shotsToRemove);
 
+        for(Platform platform : platforms) {
+            platform.setY(platform.getY() + 1);
+        }
+
+        platforms.removeIf(platform -> platform.getY() > BOARD_HEIGHT);
+
+        int currentMapRow = (frame / BLOCKHEIGHT) % MAP.length;
+
+        if (!spawnedRows.contains(frame / BLOCKHEIGHT)) {
+            spawnedRows.add(frame / BLOCKHEIGHT);
+            int rowToSpawn = (currentMapRow + (BOARD_HEIGHT / BLOCKHEIGHT) + 1) % MAP.length;
+    
+            for (int col = 0; col < MAP[rowToSpawn].length; col++) {
+                if (MAP[rowToSpawn][col] == 2) {
+                    int runStart = col;
+                    while (col < MAP[rowToSpawn].length && MAP[rowToSpawn][col] == 2) {
+                    col++;
+                }
+                int tileX = runStart * BLOCKWIDTH;
+                int tileY = -BLOCKHEIGHT; // Spawn just above the visible screen
+                int tileWidth = (col - runStart) * BLOCKWIDTH;
+            
+                platforms.add(new Platform(tileX, tileY, tileWidth, BLOCKHEIGHT, new Color(60, 40, 20)));
+                }
+            }
+        }
+        shots.removeAll(shotsToRemove);
+        platforms.removeAll(platformsToRemove);
+
+        if(player.isVisible()) {
+            Rectangle playerBounds = player.getBounds();
+
+            for (Platform platform : platforms) {
+                Rectangle platformBounds = platform.getBounds();
+                if (playerBounds.intersects(platformBounds)) {
+                    player.setDying(true);
+                    var ii = new ImageIcon(IMG_EXPLOSION);
+                    player.setImage(ii.getImage());
+                    explosions.add(new Explosion(player.getX(), player.getY()));
+                    try {
+                        String filePath = "src/audio/Explosion.wav";
+                        audioPlayer = new AudioPlayer(filePath);
+                        audioPlayer.playOnce();
+                    } catch (Exception er) {
+                        System.err.println("Error initializing audio player: " + er.getMessage());
+                    }
+                    break; 
+                }
+            }
+
+            for (Enemy enemy : enemies) {
+                Rectangle enemyBounds = enemy.getBounds();
+                if (playerBounds.intersects(enemyBounds)) {
+                    var ii = new ImageIcon(IMG_EXPLOSION);
+                    player.setImage(ii.getImage());
+                    explosions.add(new Explosion(player.getX(), player.getY()));
+                    try {
+                        String filePath = "src/audio/Explosion.wav";
+                        audioPlayer = new AudioPlayer(filePath);
+                        audioPlayer.playOnce();
+                    } catch (Exception er) {
+                        System.err.println("Error initializing audio player: " + er.getMessage());
+                    }
+                    break; 
+                }
+            }
+        }
         // enemies
         // for (Enemy enemy : enemies) {
         //     int x = enemy.getX();
@@ -576,6 +733,13 @@ public class Scene1 extends JPanel {
                     // Create a new shot and add it to the list
                     Shot shot = new Shot(x, y);
                     shots.add(shot);
+                }
+                try {
+                    String filePath = "src/audio/shot.mp3";
+                    audioPlayer = new AudioPlayer(filePath);
+                    audioPlayer.playOnce();
+                } catch (Exception er) {
+                    System.err.println("Error initializing audio player: " + er.getMessage());
                 }
             }
 

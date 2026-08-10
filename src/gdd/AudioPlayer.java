@@ -105,6 +105,12 @@ public class AudioPlayer {
         status = "play";
     }
 
+    public void playOnce() {
+        clip.setFramePosition(0);
+        clip.loop(0);
+        clip.start();
+        status = "play";
+    }
 
     // Method to pause the audio
     public void pause() {

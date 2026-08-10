@@ -14,6 +14,13 @@ public class Player extends Sprite {
 
     private Rectangle bounds = new Rectangle(175,135,17,32);
 
+    public Rectangle getBounds() {
+        int w = (getImage() != null) ? getImage().getWidth(null) : 17;
+        int h = (getImage() != null) ? getImage().getHeight(null) : 32;
+        bounds = new Rectangle(getX(), getY(), w, h);
+        return bounds;
+    }
+
     public Player() {
         initPlayer();
     }
@@ -45,37 +52,62 @@ public class Player extends Sprite {
 
     public void act() {
         x += dx;
+        y += dy;
 
         if (x <= 2) {
             x = 2;
         }
+        if (y <= 2) {
+            y = 2;
+        }
 
         if (x >= BOARD_WIDTH - 2 * width) {
             x = BOARD_WIDTH - 2 * width;
+        }
+
+        if (y >= BOARD_HEIGHT - 2 * width) {
+            y = BOARD_HEIGHT - 2 * width;
         }
     }
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_A) {
             dx = -currentSpeed;
         }
 
-        if (key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_D) {
             dx = currentSpeed;
         }
+
+        if (key == KeyEvent.VK_W) {
+            dy = -currentSpeed;
+        }
+
+        if (key == KeyEvent.VK_S) {
+            dy = currentSpeed;
+        }
+
     }
 
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_LEFT) {
+        if (key == KeyEvent.VK_A) {
             dx = 0;
         }
 
-        if (key == KeyEvent.VK_RIGHT) {
+        if (key == KeyEvent.VK_D) {
             dx = 0;
+        }
+
+        if (key == KeyEvent.VK_W) {
+            dy = 0;
+        }
+
+        if (key == KeyEvent.VK_S) {
+            dy = 0;
         }
     }
 }

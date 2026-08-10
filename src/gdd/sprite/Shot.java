@@ -2,6 +2,7 @@ package gdd.sprite;
 
 import static gdd.Global.*;
 import javax.swing.ImageIcon;
+import java.awt.Rectangle;
 
 public class Shot extends Sprite {
 
@@ -16,6 +17,8 @@ public class Shot extends Sprite {
         initShot(x, y);
     }
 
+
+
     private void initShot(int x, int y) {
 
         var ii = new ImageIcon(IMG_SHOT);
@@ -28,5 +31,9 @@ public class Shot extends Sprite {
 
         setX(x + H_SPACE);
         setY(y - V_SPACE);
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, H_SPACE, V_SPACE);
     }
 }
